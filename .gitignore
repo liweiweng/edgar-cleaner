@@ -1,5 +1,10 @@
-#files .zip
+#MAC
+.DS_Store
+
+#files .zip .csv
 *.zip
+*.csv
+*.gzip
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
