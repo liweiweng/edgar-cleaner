@@ -88,9 +88,9 @@ def main(argv):
       elif opt in ("-p", "--path"):
          path = arg
       elif opt in ("-r", "--results"):
-         path = arg
+         results = arg
        
-    process_data(path)
+    process_data(path, results)
    
 if __name__ == "__main__":
     main(sys.argv[1:])
