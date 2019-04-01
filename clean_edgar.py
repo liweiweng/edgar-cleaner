@@ -90,7 +90,7 @@ def main(argv):
       elif opt in ("-r", "--results"):
          results = arg
        
-    process_data(path, results)
+   process_data(path, results)
    
 if __name__ == "__main__":
     main(sys.argv[1:])
