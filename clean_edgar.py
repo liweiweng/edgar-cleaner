@@ -25,6 +25,8 @@ error_code_limit = 300
     #   remove codes >=error_code_limit
     #   remove robots:  based on the number of unique firms that a given IP address
     #                   downloads on a given day. if it is more than the threshold is a robot.
+    #
+    # columns to keep:ip,date,time,cik,accession(mapping with form type and date),extention
           
 def process_day(path, date_dir, day_file, results_path):
     path_day = path + date_dir + '/' + day_file
@@ -42,13 +44,13 @@ def process_day(path, date_dir, day_file, results_path):
             print("original size:" + str(df.size))
             
             df = df[(df.crawler == np.float64(0)) & (df.idx == np.float64(0)) & (df.code < error_code_limit)]
-            df.drop(columns=['crawler'])
+            df = df.drop(columns=['zone','code','size','idx','norefer','noagent','find','crawler','browser'])
             print(df.head())
             print("after removeing crawerls, index, codes:" + str(df.size))
             
             downloads_count = df.ip.value_counts()
-            d = downloads_count[downloads_count<threshold].index
-            df = df[df.ip.isin(d)]
+            downloads_count = downloads_count[downloads_count<threshold].index
+            df = df[df.ip.isin(downloads_count)]
             print("after removing robots:" + str(df.size))
             df.to_csv(result_dir + '/' + matcher.group(1) + '.csv.gzip', compression='gzip', index=False)
             
@@ -73,16 +75,19 @@ def process_data(path, results_path):
 def main(argv):
     
    path = ''
+   results = ''
    try:
-      opts, args = getopt.getopt(argv,"hp",["path="])
+      opts, args = getopt.getopt(argv,"hp:r",["path=","results="])
    except getopt.GetoptError:
-      print ('clean_edgar.py -p <path>')
+      print ('clean_edgar.py -p <path> -r <results_path>')
       sys.exit(2)
    for opt, arg in opts:
       if opt == '-h':
-         print ('clean_edgar.py -p <path>')
+         print ('clean_edgar.py -p <path> -r <results_path>')
          sys.exit()
       elif opt in ("-p", "--path"):
+         path = arg
+      elif opt in ("-r", "--results"):
          path = arg
        
     process_data(path)
