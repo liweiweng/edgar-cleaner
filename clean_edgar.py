@@ -14,6 +14,8 @@ import os
 from os import listdir
 from os.path import isdir, join
 import re
+import sys
+import getopt
 
 threshold = 50
 error_code_limit = 300
@@ -57,6 +59,8 @@ def process_day(path, date_dir, day_file, results_path):
 
 
 def process_data(path, results_path):
+    print('path=' + path)
+    print('results_path=' + results_path)
     date_dirs = [f for f in listdir(path) if isdir(join(path, f))]
     regex_dir = re.compile('([0-9]{4})')
     regex_zip = re.compile('log([0-9]{4})([0-9]{2})([0-9]{2}).zip')
@@ -69,15 +73,13 @@ def process_data(path, results_path):
 
 #process_data('/Users/mikaelapisanileal/Documents/edgar/edger-cleaner/', '/Users/mikaelapisanileal/Documents/edgar/edger-cleaner/results')
 
-#process_day('/Users/mikaelapisanileal/Documents/edgar/edger-cleaner/', '2014', 'log20140101.zip', '/Users/mikaelapisanileal/Documents/edgar/edger-cleaner/results')
-
 
 def main(argv):
     
    path = ''
    results = ''
    try:
-      opts, args = getopt.getopt(argv,"hp:r",["path=","results="])
+      opts, args = getopt.getopt(argv,'hp:r:',['path=','results='])
    except getopt.GetoptError:
       print ('clean_edgar.py -p <path> -r <results_path>')
       sys.exit(2)
@@ -85,9 +87,9 @@ def main(argv):
       if opt == '-h':
          print ('clean_edgar.py -p <path> -r <results_path>')
          sys.exit()
-      elif opt in ("-p", "--path"):
+      elif opt in ('-p', '--path'):
          path = arg
-      elif opt in ("-r", "--results"):
+      elif opt in ('-r', '--results'):
          results = arg
        
    process_data(path, results)
@@ -95,3 +97,4 @@ def main(argv):
 if __name__ == "__main__":
     main(sys.argv[1:])
 
+#python clean_edgar.py -p '/Users/mikaelapisanileal/Documents/edgar/edger-cleaner/' -r '/Users/mikaelapisanileal/Documents/SASUniversityEdition/myfolders'
