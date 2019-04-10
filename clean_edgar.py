@@ -10,15 +10,17 @@ Created on Mon Mar 25 16:01:57 2019
 import pandas as pd
 import zipfile
 import numpy as np
-import os
 from os import listdir
 from os.path import isdir, join
 import re
 import sys
 import getopt
+import math
+
 
 threshold = 50
 error_code_limit = 300
+output_size_gb = 5
 
 #function to process one file
 #data cleaning process
@@ -44,7 +46,7 @@ def process_day(path, date_dir, day_file, results_path):
             print("original size:" + str(df.size))
             
             df = df[(df.crawler == np.float64(0)) & (df.idx == np.float64(0)) & (df.code < error_code_limit)]
-            df = df.drop(columns=['zone','code','size','idx','norefer','noagent','find','crawler','browser'])
+            df.drop(columns=['zone','code','size','idx','norefer','noagent','find','crawler','browser'], inplace=True)
             print("after removeing crawerls, index, codes:" + str(df.size))
             
             downloads_count = df.ip.value_counts()
@@ -53,8 +55,17 @@ def process_day(path, date_dir, day_file, results_path):
             print("after removing robots:" + str(df.size))
     return df
             
-
-
+def save_csv(df, results_path, date_dir):
+    row_size = sum([df.memory_usage()[1] for pair in df.memory_usage().iteritems()])
+    chunks = math.trunc(row_size/(10000000000*output_size_gb))
+    if chunks>0:
+        idx = 0
+        for chunk in np.array_split(df, chunks):
+            chunk.to_csv(results_path + '/' + date_dir + '_' + str(idx) + '.csv', index=False)
+            idx=+1
+    else:
+        df.to_csv(results_path + '/' + date_dir + '_0.csv', index=False)
+    
 def process_data(path, results_path):
     date_dirs = [f for f in listdir(path) if isdir(join(path, f))]
     regex_dir = re.compile('([0-9]{4})')
@@ -65,9 +76,9 @@ def process_data(path, results_path):
             for day_file in listdir(path + date_dir):
                 if regex_zip.match(day_file):
                        df = df.append(process_day(path, date_dir, day_file, results_path))
+            print("saving data:" + str(df.size))
+            save_csv(df, results_path, date_dir)
             
-            print("saving file:" + str(df.size))
-            df.to_csv(results_path + '/' + date_dir + '.csv.gzip', compression='gzip', index=False)
             
 #process_data('/Users/mikaelapisanileal/Documents/edgar/edger-cleaner/', '/Users/mikaelapisanileal/Documents/edgar/edger-cleaner/results')
 
