@@ -20,7 +20,7 @@ import math
 
 threshold = 50
 error_code_limit = 300
-output_size_gb = 5
+output_size_gb = 5*10000000000
 
 #function to process one file
 #data cleaning process
@@ -57,7 +57,7 @@ def process_day(path, date_dir, day_file, results_path):
             
 def save_csv(df, results_path, date_dir):
     row_size = sum([df.memory_usage()[1] for pair in df.memory_usage().iteritems()])
-    chunks = math.trunc(row_size/(10000000000*output_size_gb))
+    chunks = math.trunc(row_size/output_size_gb)
     if chunks>0:
         idx = 0
         for chunk in np.array_split(df, chunks):
