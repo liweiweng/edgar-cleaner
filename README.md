@@ -1,19 +1,25 @@
 # Edger-cleaner
 Python script for cleaning EDGER data
 
+## Clone repository
+git clone https://github.com/mikaelapisani/edger-cleaner.git
+
 ## Virtualenv
-python3 -m v
+python3 -m venv edger-cleaner
 
 ## Install requirements
-source 
+source edger-cleaner/bin/activate
+cd edger-cleaner 
 pip install --upgrade pip
 pip install -r requirements.txt
 
 ## Execution
+For all years: nohup python3 clean_edgar.py -p <folders_path> -r <results_path> &
+For specific year: nohup python3 clean_edgar.py -p <folders_path> -r <results_path> -y <year> &
 
-python3 clean_edgar.py -p '/Volumes/TOSHIBA EXT/rawEDGAR/' -r '/Users/mikaelapisanileal/Documents/SASUniversityEdition/myfolders' -y '2014'
+nohup python3 clean_edgar.py -p '/Volumes/TOSHIBA EXT/rawEDGAR/' -r '/Users/mikaelapisanileal/Documents/SASUniversityEdition/myfolders' -y '2014' &
 
-## Cleaning
+## Data Cleaning
 1. Remove crawerls
 2. Remove index
 3. Remove codes >=error_code_limit
