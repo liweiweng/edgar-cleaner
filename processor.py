@@ -28,9 +28,36 @@ class Config:
         prop = Property()
         self.config = prop.load_property_files(path)
         self.transferData = TransferData(self.config['access_token'])
+        self.threshold= int(config['threshold'])
+        self.error_code_limit=int(config['error_code_limit'])
+        self.output_size_mb=int(config['output_size_mb'])
+        self.access_token=config['access_token']
+        self.dropbox_folder=config['dropbox_folder']
+        self.rows_master_skip=config['rows_master_skip']
+        self.data_path=config['data_path']
+        self.master_path=config['master_path']
+        self.results_path=config['results_path']
         
-    def get(self, key):
-        return self.config[key]
+        def get_transferData():
+            return self.transferData
+        def get_threshold():
+            return self.threshold
+        def get_error_code_limit():
+            return self.error_code_limit
+        def get_output_size_mb():
+            return self.output_size_mb
+        def get_access_token():
+            return self.access_token
+        def get_dropbox_folder():
+            return self.dropbox_folder
+        def getrows_master_skip():
+            return self.rows_master_skip
+        def get_data_path():
+            return self.data_path
+        def getmaster_path():
+            return self.master_path
+        def get_results_path()¨:
+            return self.results_path
 
 
 class Processor:
@@ -48,7 +75,7 @@ class Processor:
         # columns to keep:ip,date,time,cik,extention
         # merge with masters' data by accession and cik
     def process_day(self, date_dir, day_file, masters):
-        path_day = self.config.get('data_path') + '/' + date_dir + '/' + day_file
+        path_day = self.config.get_data_path + '/' + date_dir + '/' + day_file
         zf = zipfile.ZipFile(path_day)
         zp_list = zipfile.ZipFile.namelist(zf)
         csv_regex = re.compile('(.*)\.csv')
@@ -60,12 +87,12 @@ class Processor:
                 print("Processing day: " + file)
                 print("original size:" + str(df.size))
                 
-                df = df[(df.crawler == np.float64(0)) & (df.idx == np.float64(0)) & (df.code < self.config.get('error_code_limit'))]
+                df = df[(df.crawler == np.float64(0)) & (df.idx == np.float64(0)) & (df.code < self.config.get_error_code_limit)]
                 df = df[['ip', 'date', 'time', 'cik', 'accession', 'extention']]
                 print("after removeing crawerls, index, codes:" + str(df.size))
                 
                 downloads_count = df.ip.value_counts()
-                downloads_count = downloads_count[downloads_count<self.config.get('threshold')].index
+                downloads_count = downloads_count[downloads_count<self.config.get_threshold].index
                 df = df[df.ip.isin(downloads_count)]
                 print("after removing robots:" + str(df.size))
         data_merged = pd.merge(df, masters, how='inner', left_on=['accession', 'cik'], 
@@ -80,20 +107,20 @@ class Processor:
         mem_usage_1 = (round(df1.memory_usage(deep=True).sum() / 1024 ** 2, 2))
         mem_usage_2 = (round(df2.memory_usage(deep=True).sum() / 1024 ** 2, 2))
         print((mem_usage_1 + mem_usage_2), 'MG')
-        chunks = math.trunc((mem_usage_1 + mem_usage_2)/self.config.get('output_size_mb'))
+        chunks = math.trunc((mem_usage_1 + mem_usage_2)/self.config.get_put_size_mb)
         print('chunks=' + str(chunks))
         return (chunks > 0)
     
     #get amount of chunks based on output_size_gb
     def get_chunks(self, df):
         mem_usage_1 = (round(df.memory_usage(deep=True).sum() / 1024 ** 2, 2))
-        return math.trunc(mem_usage_1/self.config.get('output_size_mb'))
+        return math.trunc(mem_usage_1/self.config.get_output_size_mb)
     
     #upload file to dropbox 
     def save_csv(self, df, year, idx):
         year_idx = year + '_' + str(idx) + '.csv'
-        file_from = self.config.get('results_path') + '/' + year_idx
-        file_to = self.config.get('dropbox_folder') + year_idx
+        file_from = self.config.get_results_path + '/' + year_idx
+        file_to = self.config.get_dropbox_folder + year_idx
         df.to_csv(file_from, index=False)
         print('Uploading file: ' + file_from)
         self.transferData.upload_file(file_from, file_to)
@@ -116,10 +143,10 @@ class Processor:
         masters = pd.DataFrame(data={})
         regex_file = re.compile('master' + '/' + year + '.*')
        
-        for master_file in listdir(self.config.get('master_path')):
+        for master_file in listdir(self.config.get_master_path):
             if (regex_file.match(master_file)):
-                master = pd.read_csv(self.config.get('master_path') + master_file, 
-                                     skiprows=self.config.get('rows_master_skip'),
+                master = pd.read_csv(self.config.get_master_path + master_file, 
+                                     skiprows=self.config.get_rows_master_skip,
                                      names=['CIK','Company Name', 'Form Type', 'Date Filed', 'Filename'],
                                      sep='|')
                 masters = masters.append(master)
@@ -139,7 +166,7 @@ class Processor:
         regex_zip = re.compile('log([0-9]{4})([0-9]{2})([0-9]{2}).zip')
         idx = 0
         masters = self.load_master(year)
-        for day_file in listdir(self.config.get('data_path') + '/' + year):
+        for day_file in listdir(self.config.get_data_path + '/' + year):
             if regex_zip.match(day_file):
                 df_day = self.process_day(year, day_file, masters) 
                 if (self.check_chunks(df,df_day)):
@@ -153,7 +180,7 @@ class Processor:
                
     #for each year folder, process days files
     def process_data(self):
-        date_dirs = [f for f in listdir(self.config.get('data_path')) if isdir(join(self.config.get('data_path'), f))]
+        date_dirs = [f for f in listdir(self.config.get_data_path) if isdir(join(self.config.get_data_path, f))]
         regex_dir = re.compile('([0-9]{4})')
         for year in date_dirs:
             if (regex_dir.match(year)):
