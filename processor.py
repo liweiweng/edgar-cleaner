@@ -114,7 +114,7 @@ class Processor:
     #load data from master files and clean it
     def load_master(self, year):
         masters = pd.DataFrame(data={})
-        regex_file = re.compile('master' + year + '.*')
+        regex_file = re.compile('master' + '/' + year + '.*')
        
         for master_file in listdir(self.config.get('master_path')):
             if (regex_file.match(master_file)):
