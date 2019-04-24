@@ -26,7 +26,7 @@ from properties.p import Property
 class Config:
     def __init__(self, path):
         prop = Property()
-        self.config = prop.load_property_files('t.properties')
+        self.config = prop.load_property_files(path)
         self.transferData = TransferData(self.config['access_token'])
 
 
