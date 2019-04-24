@@ -56,7 +56,7 @@ class Config:
             return self.data_path
         def getmaster_path():
             return self.master_path
-        def get_results_path()¨:
+        def get_results_path():
             return self.results_path
 
 
