@@ -2,7 +2,10 @@
 Python script for cleaning EDGER data
 
 ## Clone repository
+Clone the repository in your home directory.  
+´´´console
 git clone https://github.com/mikaelapisani/edger-cleaner.git
+´´´
 
 ## Run in a virtualenv
 ´´´console
@@ -23,19 +26,21 @@ For specific year: nohup python3 clean_edgar.py -p <folders_path> -r <results_pa
 ´´´console
 . $HOME/conda/etc/profile.d/conda.sh
 conda activate
-cd edger-cleaner
+cd $HOME/edger-cleaner
 pip install --upgrade pip
 pip install -r requirements.txt
 conda deactivate
 ´´´
 3. Run script:
 
-The files to process are in separate folders by years in the home directory.  
+The files to process are in separate folders by years in the home directory. 
+Configure the file config.properties as follows:
+
 
 ´´´console
 mkdir $HOME/results
 conda activate
-nohup python3 clean_edgar.py -p '$HOME' -r '$HOME/results' -y '2014' &
+nohup python3 clean_edgar.py -p '$HOME' -y '2014' &
 ´´´
 ## Data Cleaning
 The process of cleaning data consists in the following steps:  
