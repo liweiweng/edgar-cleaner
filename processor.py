@@ -30,7 +30,7 @@ class Config:
         self.transferData = TransferData(self.config['access_token'])
         
     def get(self, key):
-        return self[key]
+        return self.config[key]
 
 
 class Processor:
