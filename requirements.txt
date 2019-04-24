@@ -3,4 +3,4 @@ zipfile36
 pandas 
 numpy
 dropbox
-properties
+property
