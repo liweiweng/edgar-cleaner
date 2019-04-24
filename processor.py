@@ -80,7 +80,7 @@ class Processor:
         mem_usage_1 = (round(df1.memory_usage(deep=True).sum() / 1024 ** 2, 2))
         mem_usage_2 = (round(df2.memory_usage(deep=True).sum() / 1024 ** 2, 2))
         print((mem_usage_1 + mem_usage_2), 'MG')
-        chunks = math.trunc((mem_usage_1 + mem_usage_2)/self.config.get('output_size_mb')
+        chunks = math.trunc((mem_usage_1 + mem_usage_2)/self.config.get('output_size_mb'))
         print('chunks=' + str(chunks))
         return (chunks > 0)
     
