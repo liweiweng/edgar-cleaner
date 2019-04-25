@@ -7,7 +7,7 @@ Created on Thu Apr 25 08:47:47 2019
 """
 
 from properties.p import Property
-
+from transfer import TransferData
 
 class Config:
     def __init__(self, path):
