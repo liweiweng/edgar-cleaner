@@ -50,7 +50,7 @@ results_path=/home/username/results
 ´´´console
 mkdir $HOME/results
 conda activate
-nohup python3 clean_edgar.py --config '$HOME/config.properties' -y '2014' &
+nohup python3 clean_edgar.py --config $HOME/config.properties -y '2014' &
 ´´´
 ## Data Cleaning
 The process of cleaning data consists in the following steps:  

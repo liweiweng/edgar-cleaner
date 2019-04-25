@@ -10,6 +10,7 @@ Created on Mon Mar 25 16:01:57 2019
 import sys
 import getopt
 from processor import Processor
+from config import Config
 
 def info():
     print('clean_edgar.py -p <path> -r <results_path>')
@@ -30,7 +31,8 @@ def main(argv):
          config_path = arg
       elif opt in ('-y', '--year'):
          year = arg
-   processor = Processor(config_path)
+   config = Config(config_path)
+   processor = Processor(config)
    if (year==''):
        processor.process_data()
    else:
