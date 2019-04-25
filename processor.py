@@ -20,9 +20,6 @@ if sys.version_info >= (3, 6):
 else:
     import zipfile36 as zipfile
 
-from transfer import TransferData
-from config import Config
-
 class Processor:
     def __init__(self, config):
         self.config = config

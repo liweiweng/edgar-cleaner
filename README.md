@@ -29,7 +29,6 @@ conda activate
 cd $HOME/edger-cleaner
 pip install --upgrade pip
 pip install -r requirements.txt
-conda deactivate
 ´´´
 3. Run script:
 
