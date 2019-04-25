@@ -67,7 +67,7 @@ class Processor:
         mem_usage_1 = (round(df1.memory_usage(deep=True).sum() / 1024 ** 2, 2))
         mem_usage_2 = (round(df2.memory_usage(deep=True).sum() / 1024 ** 2, 2))
         print((mem_usage_1 + mem_usage_2), 'MG')
-        chunks = math.trunc((mem_usage_1 + mem_usage_2)/self.config.put_size_mb)
+        chunks = math.trunc((mem_usage_1 + mem_usage_2)/self.config.output_size_mb)
         print('chunks=' + str(chunks))
         return (chunks > 0)
     
@@ -101,11 +101,11 @@ class Processor:
     #load data from master files and clean it
     def load_master(self, year):
         masters = pd.DataFrame(data={})
-        regex_file = re.compile('master' + '/' + year + '.*')
+        regex_file = re.compile('master' + year + '.*')
        
         for master_file in listdir(self.config.master_path):
             if (regex_file.match(master_file)):
-                master = pd.read_csv(self.config.master_path + master_file, 
+                master = pd.read_csv(self.config.master_path + '/' + master_file, 
                                      skiprows=self.config.rows_master_skip,
                                      names=['CIK','Company Name', 'Form Type', 'Date Filed', 'Filename'],
                                      sep='|')

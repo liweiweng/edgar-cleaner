@@ -19,7 +19,7 @@ class Config:
         self.output_size_mb=int(self.config['output_size_mb'])
         self.access_token=self.config['access_token']
         self.dropbox_folder=self.config['dropbox_folder']
-        self.rows_master_skip=self.config['rows_master_skip']
+        self.rows_master_skip=int(self.config['rows_master_skip'])
         self.data_path=self.config['data_path']
         self.master_path=self.config['master_path']
         self.results_path=self.config['results_path']
