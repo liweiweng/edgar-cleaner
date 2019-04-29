@@ -29,27 +29,39 @@ conda activate
 cd $HOME/edger-cleaner
 pip install --upgrade pip
 pip install -r requirements.txt
+conda deactivate
 ´´´
 3. Run script:
 
 The files to process are in separate folders by years in the home directory. 
-Configure the file config.properties as follows, changin username by your username:   
+Configure the file config.properties as follows, changin username by your username and setting the access token for dropbox:       
 
 ´´´console
 threshold=50
 error_code_limit=300
-output_size_mb=5*1000
-access_token=dhZNW6DTN2AAAAAAAAAC2ebJv8jOEPyPNb31b0cf7EtbeVqq8YpRPmiKjLxVT099
+output_size_mb=5000
+access_token=
 dropbox_folder=/edgar_test/
 rows_master_skip=11
 data_path=/home/username
 master_path=/home/username/masters
 results_path=/home/username/results
 ´´´
+
+threshold:   
+error_code_limit:   
+output_size_mb:   
+access_token: Dropbox access token   
+dropbox_folder: Dropbox folder name   
+rows_master_skip: amount of rows to skip in masters' file    
+data_path: Path for data, inside this folder there should be one folder per year.    
+master_path: Path for masters' files   
+results_path: Path for temporary result files.   
+
 ´´´console
 mkdir $HOME/results
 conda activate
-nohup python3 clean_edgar.py --config $HOME/config.properties -y '2014' &
+nohup python3 clean_edgar.py --config $HOME/edger-cleaner/config.properties -y '2014' &
 ´´´
 ## Data Cleaning
 The process of cleaning data consists in the following steps:  
@@ -65,6 +77,9 @@ The process of cleaning data consists in the following steps:
 The result data is saved in dropbox.   
 As the files are going to be analyzed with SAS it is necessary that the size would be less than 5GB.   
 In order to achieve these, for each day, it is checked if when appending the result for the day the size is greater than the threshold, in that case, the accummulated result is uploaded to dropbox and continue with the processing until there are no more files to process.   
+
+It is necessary to create in dropbox an app to save the files into a folder. Generate a token for that app.
+This token is the one that should be in the property access_token in the configuration.
 
 ## Columns from result
 - ip: with ###.###.###.xxx – first three octets of the IP address with the fourth octet obfuscated with a 3 character string that preserves the uniqueness of the last octet without revealing the full identity of the IP
