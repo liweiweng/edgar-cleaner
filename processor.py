@@ -90,7 +90,7 @@ class Processor:
         try:
            self.transferData.upload_file(file_from, file_to)
         except Exception as err:
-           print("Failed to upload %s\n%s" % (from_file, err))
+           print("Failed to upload %s\n%s" % (file_from, err))
            upload_error = True
         if not upload_error:
            os.remove(file_from)
