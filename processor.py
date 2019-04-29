@@ -19,10 +19,13 @@ if sys.version_info >= (3, 6):
     import zipfile
 else:
     import zipfile36 as zipfile
+from transfer import TransferData
+from config import Config
 
 class Processor:
     def __init__(self, conf):
         self.config = conf
+        self.transferData = TransferData(self.config.access_token, self.config.dropbox_timeout)
       
     #function to process one file (a day)
     #data cleaning process
@@ -83,8 +86,15 @@ class Processor:
         file_to = self.config.dropbox_folder + year_idx
         df.to_csv(file_from, index=False)
         print('Uploading file: ' + file_from)
-        self.transferData.upload_file(file_from, file_to)
-        os.remove(file_from)    
+        upload_error = False
+        try:
+           self.transferData.upload_file(file_from, file_to)
+        except Exception as err:
+           print("Failed to upload %s\n%s" % (from_file, err))
+           upload_error = True
+        if not upload_error:
+           os.remove(file_from)
+    
     
     #divide file into chunks and upload to dropbox          
     def save_data(self, df, year, idx):
