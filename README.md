@@ -22,8 +22,8 @@ For specific year: python clean_edgar.py -c <config_path> -y <year>
 ## Execution in the TTU cluster
 1. It is necessary to have installed conda. 
    Follow these guide if not installed: http://www.depts.ttu.edu/hpcc/userguides/application_guides/python.local_installation.php
-2. Create virtualenv: 
-´´´console
+2. Create virtualenv:    
+´´´bash
 . $HOME/conda/etc/profile.d/conda.sh
 conda activate
 cd $HOME/edger-cleaner
@@ -34,8 +34,8 @@ conda deactivate
 3. Download the repository at your home directory
 4. Edit config.properties file with the corresponding paths
 4. Edit line 16 of mpi.sh file with the year you want to execute
-5. Execute the following command:    
-´´´console
+5. Execute the following command:        
+´´´bash
 qsub /home/mikleal/edger-cleaner/mpi/mpi.sh
 ´´´
 
@@ -45,9 +45,9 @@ In this case it is configured only 1 process as it has to be serial.  In the fut
 
 ## Configuration
 
-Configure the file `config.properties`` as follows:         
+Configure the file ``config.properties`` as follows:         
 
-´´´console
+´´´bash
 threshold=50
 error_code_limit=300
 output_size_mb=5000
