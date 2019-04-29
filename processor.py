@@ -94,6 +94,7 @@ class Processor:
            upload_error = True
         if not upload_error:
            os.remove(file_from)
+        return idx
     
     
     #divide file into chunks and upload to dropbox          
