@@ -41,8 +41,16 @@ qsub /home/mikleal/edger-cleaner/mpi/mpi.sh
 ```
 
 ### MPI
-In order to run the jobs in the cluster it is used MPI. It can be found more information about how to run jobs in the cluster in the following link: http://www.depts.ttu.edu/hpcc/userguides/general_guides/job_submission.php.      
+In order to run the jobs in the cluster it is used MPI. It can be found more information about how to run jobs in the cluster in the following link: http://www.depts.ttu.edu/hpcc/userguides/general_guides/job_submission.php     
 In this case it is configured only 1 process as it has to be serial.  In the future, the code could be modified in order to parallelize the process of the information and clean the data faster.   
+
+*Commands*
+- list jobs: qstat
+- kill job: qdel <JOB_ID>
+- see output: tail -f <PROJECT_NAME>
+
+The project name is in the file mpi/mpi.sh in the -N parameter.
+If you want to run multiple jobs for example for different years, change that name in the file (line 5) as well as the parameter corresponding to the year when executing the run script (line 16).     
 
 ## Configuration
 
