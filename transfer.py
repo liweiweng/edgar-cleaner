@@ -15,6 +15,10 @@ class TransferData:
         self.access_token = access_token
         self.CHUNK_SIZE = 4 * 1024 * 1024
         self.timeout = timeout
+        
+    def create_folder(self, path):
+        dbx = dropbox.Dropbox(self.access_token, timeout=self.timeout)
+        dbx.files_create_folder(path)
 
     def upload_file(self, file_from, file_to):
         dbx = dropbox.Dropbox(self.access_token, timeout=self.timeout)

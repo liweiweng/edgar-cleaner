@@ -154,6 +154,7 @@ class Processor:
         for year in date_dirs:
             if (regex_dir.match(year)):
                 before = datetime.datetime.now()
+                self.transferData.create_folder(self.config.dropbox_folder + year)
                 self.process_year(year)
                 after = datetime.datetime.now()
                 print('time elapsed for year ' + year + ':' + str((after - before)))
