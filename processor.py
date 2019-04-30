@@ -83,7 +83,7 @@ class Processor:
     def save_csv(self, df, year, idx):
         year_idx = year + '_' + str(idx) + '.csv'
         file_from = self.config.results_path + '/' + year_idx
-        file_to = self.config.dropbox_folder + year_idx
+        file_to = self.config.dropbox_folder + year + '/' + year_idx
         df.to_csv(file_from, index=False)
         print('Uploading file: ' + file_from)
         upload_error = False
