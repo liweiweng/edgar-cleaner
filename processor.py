@@ -94,19 +94,17 @@ class Processor:
            upload_error = True
         if not upload_error:
            os.remove(file_from)
-        return idx
+        return idx+1
     
     
     #divide file into chunks and upload to dropbox          
     def save_data(self, df, year, idx):
         chunks = self.get_chunks(df)
         if (chunks==0):
-            self.save_csv(df, year, idx)
-            idx+=1
+            idx = self.save_csv(df, year, idx)
         else:
             for chunk in np.array_split(df, chunks):
-                self.save_csv(chunk, year, idx)
-                idx+=1
+                idx = self.save_csv(chunk, year, idx)
         
     
     #load data from master files and clean it
@@ -141,13 +139,13 @@ class Processor:
             if regex_zip.match(day_file):
                 df_day = self.process_day(year, day_file, masters) 
                 if (self.check_chunks(df,df_day)):
-                    idx = self.save_csv(df, year, idx)
+                    idx = self.save_data(df, year, idx)
                     df = df_day
                 else:
                     df = df.append(df_day)
         
         if (df.shape[0]>0):
-            self.save_data(df, year, idx)        
+            idx = self.save_data(df, year, idx)        
                
     #for each year folder, process days files
     def process_data(self):
