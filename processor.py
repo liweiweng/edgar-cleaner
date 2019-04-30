@@ -135,6 +135,8 @@ class Processor:
         regex_zip = re.compile('log([0-9]{4})([0-9]{2})([0-9]{2}).zip')
         idx = 0
         masters = self.load_master(year)
+        print("Processing year " + year)
+        self.transferData.create_folder(self.config.dropbox_folder + year)
         for day_file in listdir(self.config.data_path + '/' + year):
             if regex_zip.match(day_file):
                 df_day = self.process_day(year, day_file, masters) 
@@ -154,7 +156,6 @@ class Processor:
         for year in date_dirs:
             if (regex_dir.match(year)):
                 before = datetime.datetime.now()
-                self.transferData.create_folder(self.config.dropbox_folder + year)
                 self.process_year(year)
                 after = datetime.datetime.now()
                 print('time elapsed for year ' + year + ':' + str((after - before)))
