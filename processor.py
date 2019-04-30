@@ -105,6 +105,7 @@ class Processor:
         else:
             for chunk in np.array_split(df, chunks):
                 idx = self.save_csv(chunk, year, idx)
+        return idx
         
     
     #load data from master files and clean it
