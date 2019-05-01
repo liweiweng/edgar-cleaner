@@ -46,7 +46,12 @@ class Processor:
         for file in zp_list:
             matcher = csv_regex.match(file)
             if (matcher):
-                df = pd.read_csv(zf.open(file))
+                df = pd.read_csv(zf.open(file), header=0, 
+                 usecols=['ip','date','time','cik','accession',
+                 'extention','code','size','idx','crawler','browser'],
+                 dtype={'ip':object,'date':object,'time  zone':object,'cik':object,'accession':object,
+                 'extention':object,'code':np.float64,'size':np.float64,'idx':np.float64,
+                 'crawler':np.float64,'browser':object})
                 print("Processing day: " + file)
                 print("original size:" + str(df.size))
                 
@@ -83,29 +88,29 @@ class Processor:
     def save_csv(self, df, year, idx):
         year_idx = year + '_' + str(idx) + '.csv'
         file_from = self.config.results_path + '/' + year_idx
-        file_to = self.config.dropbox_folder + year_idx
+        file_to = self.config.dropbox_folder + year + '/' + year_idx
         df.to_csv(file_from, index=False)
         print('Uploading file: ' + file_from)
         upload_error = False
         try:
            self.transferData.upload_file(file_from, file_to)
         except Exception as err:
-           print("Failed to upload %s\n%s" % (from_file, err))
+           print("Failed to upload %s\n%s" % (file_from, err))
            upload_error = True
         if not upload_error:
            os.remove(file_from)
+        return idx+1
     
     
     #divide file into chunks and upload to dropbox          
     def save_data(self, df, year, idx):
         chunks = self.get_chunks(df)
         if (chunks==0):
-            self.save_csv(df, year, idx)
-            idx+=1
+            idx = self.save_csv(df, year, idx)
         else:
             for chunk in np.array_split(df, chunks):
-                self.save_csv(chunk, year, idx)
-                idx+=1
+                idx = self.save_csv(chunk, year, idx)
+        return idx
         
     
     #load data from master files and clean it
@@ -118,7 +123,9 @@ class Processor:
                 master = pd.read_csv(self.config.master_path + '/' + master_file, 
                                      skiprows=self.config.rows_master_skip,
                                      names=['CIK','Company Name', 'Form Type', 'Date Filed', 'Filename'],
-                                     sep='|')
+                                     sep='|',
+                                     dtype={'CIK': object, 'Company Name': object, 
+                                            'Form Type':object, 'Date Filed':object, 'Filename': object})
                 masters = masters.append(master)
         
         #modify filename data to keep accession number
@@ -136,17 +143,19 @@ class Processor:
         regex_zip = re.compile('log([0-9]{4})([0-9]{2})([0-9]{2}).zip')
         idx = 0
         masters = self.load_master(year)
+        print("Processing year " + year)
+        self.transferData.create_folder(self.config.dropbox_folder + year)
         for day_file in listdir(self.config.data_path + '/' + year):
             if regex_zip.match(day_file):
                 df_day = self.process_day(year, day_file, masters) 
                 if (self.check_chunks(df,df_day)):
-                    idx = self.save_csv(df, year, idx)
+                    idx = self.save_data(df, year, idx)
                     df = df_day
                 else:
                     df = df.append(df_day)
         
         if (df.shape[0]>0):
-            self.save_data(df, year, idx)        
+            idx = self.save_data(df, year, idx)        
                
     #for each year folder, process days files
     def process_data(self):
