@@ -46,7 +46,13 @@ class Processor:
         for file in zp_list:
             matcher = csv_regex.match(file)
             if (matcher):
-                df = pd.read_csv(zf.open(file))
+                df = pd.read_csv(zf.open(file), 
+                                 names=['ip','date','time  zone','cik','accession',
+                                        'extention','code','size','idx','norefer',
+                                        'noagent','find','crawler','browser'],]
+                                 dtype={'ip':object,'date':object,'time  zone':object,'cik':object,'accession':object,
+                                        'extention':object,'code':int,'size':float:,'idx':float,'norefer':object,
+                                        'noagent':object,'find':object,'crawler':float,'browser':object}))
                 print("Processing day: " + file)
                 print("original size:" + str(df.size))
                 
@@ -118,7 +124,9 @@ class Processor:
                 master = pd.read_csv(self.config.master_path + '/' + master_file, 
                                      skiprows=self.config.rows_master_skip,
                                      names=['CIK','Company Name', 'Form Type', 'Date Filed', 'Filename'],
-                                     sep='|')
+                                     sep='|',
+                                     dtype={'CIK': object, 'Company Name': object, 
+                                            'Form Type':object, 'Date Filed':object, 'Filename': object})
                 masters = masters.append(master)
         
         #modify filename data to keep accession number
