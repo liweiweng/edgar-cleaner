@@ -20,12 +20,15 @@ if sys.version_info >= (3, 6):
 else:
     import zipfile36 as zipfile
 from transfer import TransferData
-from config import Config
+import logging
 
 class Processor:
     def __init__(self, conf):
         self.config = conf
         self.transferData = TransferData(self.config.access_token, self.config.dropbox_timeout)
+        self.logging = logging.getLogger()
+        self.logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
+
       
     #function to process one file (a day)
     #data cleaning process
@@ -52,17 +55,17 @@ class Processor:
                  dtype={'ip':object,'date':object,'time  zone':object,'cik':object,'accession':object,
                  'extention':object,'code':np.float64,'size':np.float64,'idx':np.float64,
                  'crawler':np.float64,'browser':object})
-                print("Processing day: " + file)
-                print("original size:" + str(df.size))
-                
+                self.logging.debug('Processing day: %s', file)
+                self.logging.debug('original size:%s', str(df.size))
+            
                 df = df[(df.crawler == np.float64(0)) & (df.idx == np.float64(0)) & (df.code < self.config.error_code_limit)]
                 df = df[['ip', 'date', 'time', 'cik', 'accession', 'extention']]
-                print("after removeing crawerls, index, codes:" + str(df.size))
+                self.logging.debug('after removeing crawerls, index, codes: %s', str(df.size))
                 
                 downloads_count = df.ip.value_counts()
                 downloads_count = downloads_count[downloads_count<self.config.threshold].index
                 df = df[df.ip.isin(downloads_count)]
-                print("after removing robots:" + str(df.size))
+                self.logging.debug('after removing robots:%s', str(df.size))
         data_merged = pd.merge(df, masters, how='inner', left_on=['accession', 'cik'], 
                                right_on=['Filename', 'CIK'])
         data_merged = data_merged[['ip', 'date', 'time', 'cik', 'accession', 
@@ -74,9 +77,9 @@ class Processor:
     def check_chunks(self, df1, df2):
         mem_usage_1 = (round(df1.memory_usage(deep=True).sum() / 1024 ** 2, 2))
         mem_usage_2 = (round(df2.memory_usage(deep=True).sum() / 1024 ** 2, 2))
-        print((mem_usage_1 + mem_usage_2), 'MG')
+        self.logging.debug(str(mem_usage_1 + mem_usage_2) + 'MG')
         chunks = math.trunc((mem_usage_1 + mem_usage_2)/self.config.output_size_mb)
-        print('chunks=' + str(chunks))
+        self.logging.debug('chunks=%s', str(chunks))
         return (chunks > 0)
     
     #get amount of chunks based on output_size_gb
@@ -90,12 +93,12 @@ class Processor:
         file_from = self.config.results_path + '/' + year_idx
         file_to = self.config.dropbox_folder + year + '/' + year_idx
         df.to_csv(file_from, index=False)
-        print('Uploading file: ' + file_from)
+        self.logging.info('Uploading file: ' + file_from)
         upload_error = False
         try:
            self.transferData.upload_file(file_from, file_to)
         except Exception as err:
-           print("Failed to upload %s\n%s" % (file_from, err))
+           logging.error('Failed to upload %s\n%s', file_from, err)
            upload_error = True
         if not upload_error:
            os.remove(file_from)
@@ -115,6 +118,7 @@ class Processor:
     
     #load data from master files and clean it
     def load_master(self, year):
+        self.logging.info('Loading masters for year:%s', year)
         masters = pd.DataFrame(data={})
         regex_file = re.compile('master' + year + '.*')
        
@@ -139,32 +143,39 @@ class Processor:
     #for each file process day
     #append to dataframe until the reaches the size
     def process_year(self, year):
-        df = pd.DataFrame(data={})
-        regex_zip = re.compile('log([0-9]{4})([0-9]{2})([0-9]{2}).zip')
-        idx = 0
-        masters = self.load_master(year)
-        print("Processing year " + year)
-        self.transferData.create_folder(self.config.dropbox_folder + year)
-        for day_file in listdir(self.config.data_path + '/' + year):
-            if regex_zip.match(day_file):
-                df_day = self.process_day(year, day_file, masters) 
-                if (self.check_chunks(df,df_day)):
-                    idx = self.save_data(df, year, idx)
-                    df = df_day
-                else:
-                    df = df.append(df_day)
-        
-        if (df.shape[0]>0):
-            idx = self.save_data(df, year, idx)        
+        try:
+            df = pd.DataFrame(data={})
+            regex_zip = re.compile('log([0-9]{4})([0-9]{2})([0-9]{2}).zip')
+            idx = 0
+            masters = self.load_master(year)
+            self.logging.info('Processing year:%s', year)
+            self.transferData.create_folder(self.config.dropbox_folder + year)
+            for day_file in listdir(self.config.data_path + '/' + year):
+                if regex_zip.match(day_file):
+                    self.logging.info('Processing day:%s', day_file)
+                    df_day = self.process_day(year, day_file, masters) 
+                    if (self.check_chunks(df,df_day)):
+                        idx = self.save_data(df, year, idx)
+                        df = df_day
+                    else:
+                        df = df.append(df_day)
+            
+            if (df.shape[0]>0):
+                idx = self.save_data(df, year, idx)    
+        except Exception as err:
+            logging.error('There has been an error processing year:%s\n%s', year, err)
                
     #for each year folder, process days files
     def process_data(self):
-        date_dirs = [f for f in listdir(self.config.data_path) if isdir(join(self.config.data_path, f))]
-        regex_dir = re.compile('([0-9]{4})')
-        for year in date_dirs:
-            if (regex_dir.match(year)):
-                before = datetime.datetime.now()
-                self.process_year(year)
-                after = datetime.datetime.now()
-                print('time elapsed for year ' + year + ':' + str((after - before)))
-     
+        try:
+            date_dirs = [f for f in listdir(self.config.data_path) if isdir(join(self.config.data_path, f))]
+            regex_dir = re.compile('([0-9]{4})')
+            for year in date_dirs:
+                if (regex_dir.match(year)):
+                    before = datetime.datetime.now()
+                    self.process_year(year)
+                    after = datetime.datetime.now()
+                    print('time elapsed for year ' + year + ':' + str((after - before)))
+        except Exception as err:
+            logging.error('There has been an error processing data\n%s', err)
+         
