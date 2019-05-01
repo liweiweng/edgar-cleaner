@@ -1,6 +1,10 @@
 #files
 201*
 
+#log files
+MPI_EDGAR_*
+machinefile.*
+
 #MAC
 .DS_Store
 

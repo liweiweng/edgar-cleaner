@@ -49,10 +49,10 @@ class Processor:
                 df = pd.read_csv(zf.open(file), 
                                  names=['ip','date','time  zone','cik','accession',
                                         'extention','code','size','idx','norefer',
-                                        'noagent','find','crawler','browser'],]
+                                        'noagent','find','crawler','browser'],
                                  dtype={'ip':object,'date':object,'time  zone':object,'cik':object,'accession':object,
-                                        'extention':object,'code':int,'size':float:,'idx':float,'norefer':object,
-                                        'noagent':object,'find':object,'crawler':float,'browser':object}))
+                                        'extention':object,'code':np.float64,'size':np.float64,'idx':float,'norefer':object,
+                                        'noagent':object,'find':object,'crawler':float,'browser':object})
                 print("Processing day: " + file)
                 print("original size:" + str(df.size))
                 
