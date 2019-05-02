@@ -26,9 +26,9 @@ class Processor:
     def __init__(self, conf):
         self.config = conf
         self.transferData = TransferData(self.config.access_token, self.config.dropbox_timeout)
+        logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
         self.logging = logging.getLogger()
-        self.logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
-
+        
       
     #function to process one file (a day)
     #data cleaning process

@@ -42,9 +42,15 @@ conda deactivate
 3. Download the repository at your home directory
 4. Edit config.properties file with the corresponding paths
 4. Edit line 16 of mpi.sh file with the year you want to execute
+5. Edit mpi.sh with the correspondent year, for example: 
+```bash
+export YEAR=2015
+sed "s/YEAR/$YEAR/g" mpi/mpi.sh > mpi/mpi_$YEAR.sh
+```
+
 5. Execute the following command:        
 ```bash
-qsub /home/mikleal/edger-cleaner/mpi/mpi.sh
+qsub mpi/mpi_$YEAR.sh
 ```
 
 #### MPI
@@ -54,13 +60,12 @@ In this case it is configured only 1 process as it has to be serial.  In the fut
 *Commands*
 - list jobs: qstat
 - kill job: qdel <JOB_ID>
-- see output: tail -f <PROJECT_NAME>
+- see output: tail -f <PROJECT_NAME>.*
+- see information about a failed job:  qacct -j <JOB_ID>
 
-The project name is in the file mpi/mpi.sh in the -N parameter.
-If you want to run multiple jobs for example for different years, change that name in the file (line 5) as well as the parameter corresponding to the year when executing the run script (line 16).     
+The project name is in the file mpi/mpi.sh in the -N parameter: "MPI_EDGAR_YEAR"
 
-
-## Execution
+## Manual execution
 For all years: python clean_edgar.py -c <config_path>    
 For specific year: python clean_edgar.py -c <config_path> -y <year>    
 
