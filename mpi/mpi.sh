@@ -2,7 +2,7 @@
 #$ -V
 #$ -cwd
 #$ -S /bin/bash
-#$ -N MPI_EDGAR_2015
+#$ -N MPI_EDGAR_YEAR
 #$ -o $JOB_NAME.o$JOB_ID
 #$ -e $JOB_NAME.e$JOB_ID
 #$ -q omni
@@ -13,4 +13,4 @@
 
 module load intel impi
 
-mpirun --machinefile machinefile.$JOB_ID -np 1 sh /home/mikleal/edger-cleaner/mpi/run.sh 2015
+mpirun --machinefile machinefile.$JOB_ID -np 1 sh /home/mikleal/edger-cleaner/mpi/run.sh YEAR
