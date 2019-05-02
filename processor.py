@@ -158,9 +158,13 @@ class Processor:
                         df = df_day
                     else:
                         df = df.append(df_day)
-            
+                        
             if (df.shape[0]>0):
+                self.logging.info('Saving last chunck for year:%s', year)
                 idx = self.save_data(df, year, idx)    
+                
+            self.logging.info('Finish processing year:%s', year)
+
         except Exception as err:
             logging.error('There has been an error processing year:%s\n%s', year, err)
                
