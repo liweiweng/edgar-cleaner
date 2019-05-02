@@ -33,10 +33,11 @@ def main(argv):
          year = arg
    config = Config(config_path)
    processor = Processor(config)
+   masters = processor.load_master()
    if (year==''):
-       processor.process_data()
+       processor.process_data(masters)
    else:
-       processor.process_year(year)
+       processor.process_year(year, masters)
    
 if __name__ == "__main__":
     main(sys.argv[1:])
