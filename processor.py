@@ -67,7 +67,7 @@ class Processor:
                 df = df[df.ip.isin(downloads_count)]
                 self.logging.debug('after removing robots:%s', str(df.size))
         
-        data_merged = pd.merge(df, masters, how='inner', left_on=['accession', 'cik'], 
+        data_merged = pd.merge(df, masters, how='left', left_on=['accession', 'cik'], 
                                right_on=['Filename', 'CIK'])
         data_merged = data_merged[['ip', 'date', 'time', 'cik', 'accession', 
                                    'extention', 'Form Type','Date Filed']]
