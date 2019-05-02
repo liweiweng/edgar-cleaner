@@ -92,7 +92,7 @@ class Processor:
         file_from = self.config.results_path + '/' + year_idx
         file_to = self.config.dropbox_folder + year + '/' + year_idx
         df.to_csv(file_from, index=False)
-        self.logging.info('Uploading file: ' + file_from)
+        self.logging.info('Uploading file: %s', file_from)
         upload_error = False
         try:
            self.transferData.upload_file(file_from, file_to)
