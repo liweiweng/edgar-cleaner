@@ -65,6 +65,7 @@ class Processor:
                 downloads_count = downloads_count[downloads_count<self.config.threshold].index
                 df = df[df.ip.isin(downloads_count)]
                 self.logging.debug('after removing robots:%s', str(df.size))
+        
         data_merged = pd.merge(df, masters, how='inner', left_on=['accession', 'cik'], 
                                right_on=['Filename', 'CIK'])
         data_merged = data_merged[['ip', 'date', 'time', 'cik', 'accession', 
@@ -152,7 +153,8 @@ class Processor:
             for day_file in listdir(self.config.data_path + '/' + year):
                 if regex_zip.match(day_file):
                     self.logging.info('Processing day:%s', day_file)
-                    df_day = self.process_day(year, day_file, masters) 
+                    df_day = self.process_day(year, day_file, masters)
+                    self.logging.info('Size:%s',str(df_day.size))
                     if (self.check_chunks(df,df_day)):
                         idx = self.save_data(df, year, idx)
                         df = df_day
