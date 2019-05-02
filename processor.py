@@ -67,7 +67,7 @@ class Processor:
                 df = df[df.ip.isin(downloads_count)]
                 self.logging.debug('after removing robots:%s', str(df.size))
         
-        data_merged = pd.merge(df, masters, how='inner', left_on=['accession', 'cik'], 
+        data_merged = pd.merge(df, masters, how='left', left_on=['accession', 'cik'], 
                                right_on=['Filename', 'CIK'])
         data_merged = data_merged[['ip', 'date', 'time', 'cik', 'accession', 
                                    'extention', 'Form Type','Date Filed']]
@@ -118,10 +118,10 @@ class Processor:
         
     
     #load data from master files and clean it
-    def load_master(self, year):
-        self.logging.info('Loading masters for year:%s', year)
+    def load_master(self):
+        self.logging.info('Loading masters for year')
         masters = pd.DataFrame(data={})
-        regex_file = re.compile('master' + year + '.*')
+        regex_file = re.compile('master*')
        
         for master_file in listdir(self.config.master_path):
             if (regex_file.match(master_file)):
@@ -143,12 +143,12 @@ class Processor:
     #process files for determined year
     #for each file process day
     #append to dataframe until the reaches the size
-    def process_year(self, year):
+    def process_year(self, year, masters):
         try:
             df = pd.DataFrame(data={})
             regex_zip = re.compile('log([0-9]{4})([0-9]{2})([0-9]{2}).zip')
             idx = 0
-            masters = self.load_master(year)
+            
             self.logging.info('Processing year:%s', year)
             self.transferData.create_folder(self.config.dropbox_folder + year)
             for day_file in listdir(self.config.data_path + '/' + year):
@@ -172,14 +172,14 @@ class Processor:
             logging.error('There has been an error processing year:%s\n%s', year, err)
                
     #for each year folder, process days files
-    def process_data(self):
+    def process_data(self, masters):
         try:
             date_dirs = [f for f in listdir(self.config.data_path) if isdir(join(self.config.data_path, f))]
             regex_dir = re.compile('([0-9]{4})')
             for year in date_dirs:
                 if (regex_dir.match(year)):
                     before = datetime.datetime.now()
-                    self.process_year(year)
+                    self.process_year(year, masters)
                     after = datetime.datetime.now()
                     print('time elapsed for year ' + year + ':' + str((after - before)))
         except Exception as err:
