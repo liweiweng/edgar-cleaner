@@ -57,7 +57,7 @@ sh $HOME/edgar-cleaner/remove_logs.sh
 8. Edit mpi.sh with the correspondent year, for example: 
 ```bash
 export YEAR=2015
-sed "s/YEAR/$YEAR/g" $HOME/edgar-cleaner/rmpi/mpi.sh > $HOME/edgar-cleaner/mpi/mpi_$YEAR.sh
+sed "s/YEAR/$YEAR/g" $HOME/edgar-cleaner/mpi/mpi.sh > $HOME/edgar-cleaner/mpi/mpi_$YEAR.sh
 ```
 7. Execute the following command:        
 ```bash
