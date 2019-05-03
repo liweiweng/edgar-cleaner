@@ -43,7 +43,8 @@ def main(argv):
          config_path = arg
       elif opt in ('-y', '--year'):
          year = arg
-      execute_processor(config_path, year)
+    
+    execute_processor(config_path, year)
    
 if __name__ == "__main__":
     main(sys.argv[1:])
