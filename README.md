@@ -39,16 +39,18 @@ pip install --upgrade pip
 pip install -r requirements.txt
 conda deactivate
 ```
-3. Download the repository at your home directory
-4. Edit config.properties file with the corresponding paths
-4. Edit line 16 of mpi.sh file with the year you want to execute
-5. Edit mpi.sh with the correspondent year, for example: 
+3. Download masters files executing the following command
+```bash
+qsub mpi/mpi_masters.sh
+```
+4. Download the repository at your home directory
+5. Edit config.properties file with the corresponding paths
+6. Edit mpi.sh with the correspondent year, for example: 
 ```bash
 export YEAR=2015
 sed "s/YEAR/$YEAR/g" mpi/mpi.sh > mpi/mpi_$YEAR.sh
 ```
-
-5. Execute the following command:        
+7. Execute the following command:        
 ```bash
 qsub mpi/mpi_$YEAR.sh
 ```

@@ -13,7 +13,6 @@ from os import listdir
 from os.path import isdir, join
 import re
 import math
-import datetime
 import sys
 if sys.version_info >= (3, 6):
     import zipfile
@@ -23,6 +22,7 @@ else:
 from transfer import TransferData
 import logging
 
+#Class for processing, cleaning and merging the EDGAR data
 class Processor:
     def __init__(self, conf):
         self.config = conf
@@ -40,7 +40,7 @@ class Processor:
         #
         # columns to keep:ip,date,time,cik,extention
         # merge with masters' data by accession and cik
-    def process_day(self, date_dir, day_file, masters):
+    def process_day(self, date_dir, day_file):
         path_day = self.config.data_path + '/' + date_dir + '/' + day_file
         zf = zipfile.ZipFile(path_day)
         zp_list = zipfile.ZipFile.namelist(zf)
@@ -67,7 +67,7 @@ class Processor:
                 df = df[df.ip.isin(downloads_count)]
                 self.logging.debug('after removing robots:%s', str(df.size))
         
-        data_merged = pd.merge(df, masters, how='left', left_on=['accession', 'cik'], 
+        data_merged = pd.merge(df, self.masters, how='left', left_on=['accession', 'cik'], 
                                right_on=['Filename', 'CIK'])
         data_merged = data_merged[['ip', 'date', 'time', 'cik', 'accession', 
                                    'extention', 'Form Type','Date Filed']]
@@ -88,20 +88,21 @@ class Processor:
         mem_usage_1 = (round(df.memory_usage(deep=True).sum() / 1024 ** 2, 2))
         return math.trunc(mem_usage_1/self.config.output_size_mb)
     
-    #upload file to dropbox 
+    #upload file to dropbox
+    #if there is an error when uploading, files would be located in results path
     def save_csv(self, df, year, idx):
         year_idx = year + '_' + str(idx) + '.csv'
         file_from = self.config.results_path + '/' + year_idx
         file_to = self.config.dropbox_folder + year + '/' + year_idx
         df.to_csv(file_from, index=False)
         self.logging.info('Uploading file: %s', file_from)
-        upload_error = False
+        upload = True
         try:
            self.transferData.upload_file(file_from, file_to)
         except Exception as err:
            logging.error('Failed to upload %s\n%s', file_from, err)
-           upload_error = True
-        if not upload_error:
+           upload = False
+        if upload:
            os.remove(file_from)
         return idx+1
     
@@ -119,31 +120,34 @@ class Processor:
     
     #load data from master files and clean it
     def load_master(self):
-        self.logging.info('Loading masters for year')
+        self.logging.info('Loading masters')
         masters = pd.DataFrame(data={})
-        regex_file = re.compile('master*')
-       
-        for master_file in listdir(self.config.master_path):
-            if (regex_file.match(master_file)):
+        try:
+            for master_file in listdir(self.config.master_path):
+                self.logging.info('Loading master file:%s', master_file)
                 master = pd.read_csv(self.config.master_path + '/' + master_file, 
-                                     skiprows=self.config.rows_master_skip,
+                                     header=None,
                                      names=['CIK','Company Name', 'Form Type', 'Date Filed', 'Filename'],
                                      sep='|',
                                      dtype={'CIK': object, 'Company Name': object, 
                                             'Form Type':object, 'Date Filed':object, 'Filename': object})
                 masters = masters.append(master)
-        
-        #modify filename data to keep accession number
-        masters['Filename'] = masters['Filename'].apply(lambda x: x.split('/')[3].replace('.txt', ''))
-        
-        #keep columns of interest
-        masters = masters[['Filename', 'CIK', 'Form Type','Date Filed']]
+            
+            #modify filename data to keep accession number
+            masters['Filename'] = masters['Filename'].apply(lambda x: x.split('/')[3].replace('.txt', ''))
+            
+            #keep columns of interest
+            masters = masters[['Filename', 'CIK', 'Form Type','Date Filed']]
+        except Exception as err:
+            logging.error('There has been an error loading master files\n%s', err)
+        self.masters = masters
         return masters
     
-    #process files for determined year
-    #for each file process day
+    #process files for a specific year
+    #for each file process day files
     #append to dataframe until the reaches the size
-    def process_year(self, year, masters):
+    #save file into dropbox
+    def process_year(self, year):
         try:
             df = pd.DataFrame(data={})
             regex_zip = re.compile('log([0-9]{4})([0-9]{2})([0-9]{2}).zip')
@@ -154,7 +158,7 @@ class Processor:
             for day_file in listdir(self.config.data_path + '/' + year):
                 if regex_zip.match(day_file):
                     self.logging.info('Processing day:%s', day_file)
-                    df_day = self.process_day(year, day_file, masters)
+                    df_day = self.process_day(year, day_file)
                     self.logging.info('Size:%s',str(df_day.size))
                     if (self.check_chunks(df,df_day)):
                         idx = self.save_data(df, year, idx)
@@ -166,22 +170,20 @@ class Processor:
                 self.logging.info('Saving last chunck for year:%s', year)
                 idx = self.save_data(df, year, idx)    
                 
-            self.logging.info('Finish processing year:%s', year)
+            self.logging.info('Finished processing year:%s', year)
 
         except Exception as err:
             logging.error('There has been an error processing year:%s\n%s', year, err)
                
     #for each year folder, process days files
-    def process_data(self, masters):
+    def process_data(self):
         try:
             date_dirs = [f for f in listdir(self.config.data_path) if isdir(join(self.config.data_path, f))]
             regex_dir = re.compile('([0-9]{4})')
             for year in date_dirs:
                 if (regex_dir.match(year)):
-                    before = datetime.datetime.now()
-                    self.process_year(year, masters)
-                    after = datetime.datetime.now()
-                    print('time elapsed for year ' + year + ':' + str((after - before)))
+                    self.process_year(year)
+                    
         except Exception as err:
             logging.error('There has been an error processing data\n%s', err)
          
