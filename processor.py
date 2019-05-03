@@ -125,19 +125,19 @@ class Processor:
         try:
             for master_file in listdir(self.config.master_path):
                 self.logging.info('Loading master file:%s', master_file)
-                master = pd.read_csv(self.config.master_path + '/' + master_file, 
-                                     header=None,
-                                     names=['CIK','Company Name', 'Form Type', 'Date Filed', 'Filename'],
-                                     sep='|',
-                                     dtype={'CIK': object, 'Company Name': object, 
-                                            'Form Type':object, 'Date Filed':object, 'Filename': object})
+                master = pd.read_csv(self.config.master_path + '/' + master_file,
+                                     header=None, dtype=object, sep='|')
+                master.rename(columns={0:'CIK', 1:'Company Name', 
+                                       2:'Form Type', 3:'Date Filed', 
+                                       4:'Filename', 5:'Html'}, inplace=True)
+                #keep columns of interest
+                master = master[['Filename', 'CIK', 'Form Type','Date Filed']]
+                #append
                 masters = masters.append(master)
-            
+                
             #modify filename data to keep accession number
             masters['Filename'] = masters['Filename'].apply(lambda x: x.split('/')[3].replace('.txt', ''))
             
-            #keep columns of interest
-            masters = masters[['Filename', 'CIK', 'Form Type','Date Filed']]
         except Exception as err:
             logging.error('There has been an error loading master files\n%s', err)
         self.masters = masters
