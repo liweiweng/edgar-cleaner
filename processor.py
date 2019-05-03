@@ -159,7 +159,6 @@ class Processor:
                 if regex_zip.match(day_file):
                     self.logging.info('Processing day:%s', day_file)
                     df_day = self.process_day(year, day_file)
-                    self.logging.info('Size:%s',str(df_day.size))
                     if (self.check_chunks(df,df_day)):
                         idx = self.save_data(df, year, idx)
                         df = df_day
