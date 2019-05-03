@@ -86,25 +86,28 @@ For specific year: python clean_edgar.py -c <config_path> -y <year>
 Configure the file ``config.properties`` as follows:         
 
 ```bash
+log_level=INFO
+since_year=1993
 threshold=50
 error_code_limit=300
 output_size_mb=5000
 access_token=
 dropbox_folder=/EDGAR data 14-17/
-dropbox_timeout=20000
-rows_master_skip=11
-data_path=/home/username/
-master_path=/home/username/masters
-results_path=/home/username/results
+dropbox_timeout=2000
+dropbox_chunck=4194304
+data_path=/home/mikleal
+master_path=/home/mikleal/masters
+results_path=/home/mikleal/results
 ```
-
+- log_level:          Log Level (INFO/DEBUG)
+- since_year:         Year since master files are downloaded
 - threshold:         Limit of firms for a given IP in a day, if this threshold is reached it is considered as robot
 - error_code_limit:  HTTP code from which rows are going to be removed 
 - output_size_mb:    limit size in MG for output files
 - access_token:      Dropbox access token   
 - dropbox_folder:    Dropbox folder name
-- dropbox_timeout:   Timeout for dropbox connection when uploading files   
-- rows_master_skip:  Amount of rows to skip in masters' file (comments)   
+- dropbox_timeout:   Timeout for dropbox connection when uploading files
+- dropbox_chunck:    Chunk size to read files to upload to dropbox  
 - data_path:         Path for data, inside this folder there should be one folder per year     
 - master_path:       Path for masters' files   
 - results_path:      Path for temporary result files.       
