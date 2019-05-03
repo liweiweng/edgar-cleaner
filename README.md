@@ -22,7 +22,7 @@ docker run -ti -v <data_dir>:/root/data -v <masters_dir>:/root/masters -v <resul
 ### Virtualenv
 ```bash
 python3 -m venv edger-cleaner
-source edger-cleaner/bin/activate
+source edgar-cleaner/bin/activate
 cd edger-cleaner 
 pip install --upgrade pip
 pip install -r requirements.txt
@@ -34,25 +34,34 @@ pip install -r requirements.txt
 ```bash
 . $HOME/conda/etc/profile.d/conda.sh
 conda activate
-cd $HOME/edger-cleaner
+cd $HOME/edgar-cleaner
 pip install --upgrade pip
 pip install -r requirements.txt
 conda deactivate
 ```
 3. Download masters files executing the following command
 ```bash
-qsub mpi/mpi_masters.sh
+mkdir $HOME/masters
+qsub $HOME/edgar-cleaner/mpi/mpi_masters.sh
 ```
-4. Download the repository at your home directory
-5. Edit config.properties file with the corresponding paths
-6. Edit mpi.sh with the correspondent year, for example: 
+4. Check that the masters files are downloded
+```bash
+ls $HOME/edgar-cleaner/masters
+```
+5. Remove logs
+```bash
+sh $HOME/edgar-cleaner/remove_logs.sh
+```
+6. Download the repository at your home directory
+7. Edit config.properties file with the corresponding paths
+8. Edit mpi.sh with the correspondent year, for example: 
 ```bash
 export YEAR=2015
-sed "s/YEAR/$YEAR/g" mpi/mpi.sh > mpi/mpi_$YEAR.sh
+sed "s/YEAR/$YEAR/g" $HOME/edgar-cleaner/rmpi/mpi.sh > $HOME/edgar-cleaner/mpi/mpi_$YEAR.sh
 ```
 7. Execute the following command:        
 ```bash
-qsub mpi/mpi_$YEAR.sh
+qsub $HOME/edgar-cleaner/mpi/mpi_$YEAR.sh
 ```
 
 #### MPI
