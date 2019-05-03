@@ -55,7 +55,7 @@ class Processor:
                 df = pd.read_csv(zf.open(file), header=0, 
                  usecols=['ip','date','time','cik','accession',
                  'extention','code','size','idx','crawler','browser'],
-                 dtype={'ip':object,'date':object,'time  zone':object,'cik':object,'accession':object,
+                 dtype={'ip':object,'date':object,'time  zone':object,'cik':np.int64,'accession':object,
                  'extention':object,'code':np.float64,'size':np.float64,'idx':np.float64,
                  'crawler':np.float64,'browser':object})
                 self.logging.debug('Processing day: %s', file)
@@ -139,8 +139,10 @@ class Processor:
                 masters = masters.append(master)
                 
             #modify filename data to keep accession number
-            masters['Filename'] = masters['Filename'].apply(lambda x: x.split('/')[3].replace('.txt', ''))
-            
+            masters.Filename = masters.Filename.apply(lambda x: x.split('/')[3].replace('.txt', ''))
+            #change type of CIK
+            masters.CIK = masters.CIK.astype(np.int64)
+
         except Exception as err:
             logging.error('There has been an error loading master files\n%s', err)
         self.masters = masters
