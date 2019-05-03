@@ -26,8 +26,11 @@ import logging
 class Processor:
     def __init__(self, conf):
         self.config = conf
-        self.transferData = TransferData(self.config.access_token, self.config.dropbox_timeout)
-        logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
+        self.transferData = TransferData(self.config.access_token, 
+                                         self.dropbox_chunck, 
+                                         self.config.dropbox_timeout)
+        #set logging configuration
+        logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.getLevelName(self.config.log_level))
         self.logging = logging.getLogger()        
       
     #function to process one file (a day)
@@ -154,7 +157,11 @@ class Processor:
             idx = 0
             
             self.logging.info('Processing year:%s', year)
-            self.transferData.create_folder(self.config.dropbox_folder + year)
+            try:
+                self.transferData.create_folder(self.config.dropbox_folder + year)
+            except Exception as err:
+                logging.warning('Error when creating folder for year:%s\n%s', year, err)
+             
             for day_file in listdir(self.config.data_path + '/' + year):
                 if regex_zip.match(day_file):
                     self.logging.info('Processing day:%s', day_file)

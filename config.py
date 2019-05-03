@@ -8,18 +8,23 @@ Created on Thu Apr 25 08:47:47 2019
 
 from properties.p import Property
 
+class Level:
+    
+
 class Config:
     def __init__(self, path):
         prop = Property()
-        self.config = prop.load_property_files(path)
-        self.access_token = self.config['access_token']
-        self.threshold= int(self.config['threshold'])
-        self.error_code_limit=int(self.config['error_code_limit'])
-        self.output_size_mb=int(self.config['output_size_mb'])
-        self.access_token=self.config['access_token']
-        self.dropbox_folder=self.config['dropbox_folder']
-        self.dropbox_timeout=float(self.config['dropbox_timeout'])
-        self.rows_master_skip=int(self.config['rows_master_skip'])
+        config = prop.load_property_files(path)
+        self.log_level = config['log_level']
+        self.access_token = config['access_token']
+        self.threshold= int(config['threshold'])
+        self.error_code_limit=int(config['error_code_limit'])
+        self.output_size_mb=int(config['output_size_mb'])
+        self.access_token=config['access_token']
+        self.dropbox_folder=config['dropbox_folder']
+        self.dropbox_chunk=int(config['dropbox_chunk'])
+        self.dropbox_timeout=float(config['dropbox_timeout'])
+        self.rows_master_skip=int(config['rows_master_skip'])
         self.data_path=self.config['data_path']
         self.master_path=self.config['master_path']
         self.results_path=self.config['results_path']

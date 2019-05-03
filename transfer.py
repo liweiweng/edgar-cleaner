@@ -11,11 +11,11 @@ import os
 
 #Transfer data to dropbox
 class TransferData:
-    def __init__(self, access_token, timeout):
+    def __init__(self, access_token, dropbox_chunck, timeout):
         self.access_token = access_token
-        self.CHUNK_SIZE = 4 * 1024 * 1024
+        self.CHUNK_SIZE = dropbox_chunck
         self.timeout = timeout
-        
+    
     def create_folder(self, path):
         dbx = dropbox.Dropbox(self.access_token, timeout=self.timeout)
         dbx.files_create_folder(path)
