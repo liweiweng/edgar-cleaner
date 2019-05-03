@@ -55,7 +55,7 @@ class Processor:
                 df = pd.read_csv(zf.open(file), header=0, 
                  usecols=['ip','date','time','cik','accession',
                  'extention','code','size','idx','crawler','browser'],
-                 dtype={'ip':object,'date':object,'time  zone':object,'cik':np.int64,'accession':object,
+                 dtype={'ip':object,'date':object,'time':object,'cik':np.int64,'accession':object,
                  'extention':object,'code':np.float64,'size':np.float64,'idx':np.float64,
                  'crawler':np.float64,'browser':object})
                 self.logging.debug('Processing day: %s', file)
