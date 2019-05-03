@@ -8,8 +8,6 @@ Created on Thu Apr 25 08:47:47 2019
 
 from properties.p import Property
 
-class Level:
-    
 
 class Config:
     def __init__(self, path):
@@ -22,11 +20,11 @@ class Config:
         self.output_size_mb=int(config['output_size_mb'])
         self.access_token=config['access_token']
         self.dropbox_folder=config['dropbox_folder']
-        self.dropbox_chunk=int(config['dropbox_chunk'])
+        self.dropbox_chunck=int(config['dropbox_chunck'])
         self.dropbox_timeout=float(config['dropbox_timeout'])
         self.rows_master_skip=int(config['rows_master_skip'])
-        self.data_path=self.config['data_path']
-        self.master_path=self.config['master_path']
-        self.results_path=self.config['results_path']
-        self.since_year=int(self.config['since_year'])
+        self.data_path=config['data_path']
+        self.master_path=config['master_path']
+        self.results_path=config['results_path']
+        self.since_year=int(config['since_year'])
         

@@ -27,7 +27,7 @@ class Processor:
     def __init__(self, conf):
         self.config = conf
         self.transferData = TransferData(self.config.access_token, 
-                                         self.dropbox_chunck, 
+                                         self.config.dropbox_chunck, 
                                          self.config.dropbox_timeout)
         #set logging configuration
         logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.getLevelName(self.config.log_level))
