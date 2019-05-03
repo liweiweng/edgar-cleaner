@@ -23,4 +23,5 @@ class Config:
         self.data_path=self.config['data_path']
         self.master_path=self.config['master_path']
         self.results_path=self.config['results_path']
+        self.since_year=int(self.config['since_year'])
         
