@@ -6,7 +6,7 @@ Created on Thu May  2 22:10:53 2019
 @author: mikaelapisanileal
 """
 
-#https://github.com/edouardswiac/python-edgar
+#Uses https://github.com/edouardswiac/python-edgar
 
 import edgar
 import sys

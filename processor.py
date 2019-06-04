@@ -55,12 +55,13 @@ class Processor:
                 df = pd.read_csv(zf.open(file), header=0, 
                  usecols=['ip','date','time','cik','accession',
                  'extention','code','size','idx','crawler','browser'],
-                 dtype={'ip':object,'date':object,'time':object,'cik':np.int64,'accession':object,
+                 dtype={'ip':object,'date':object,'time':object,'cik':np.float64,'accession':object,
                  'extention':object,'code':np.float64,'size':np.float64,'idx':np.float64,
                  'crawler':np.float64,'browser':object})
                 self.logging.debug('Processing day: %s', file)
                 self.logging.debug('original size:%s', str(df.size))
-            
+                
+                df.cik = df.cik.astype(np.int64)
                 df = df[(df.crawler == np.float64(0)) & (df.idx == np.float64(0)) & (df.code < self.config.error_code_limit)]
                 df = df[['ip', 'date', 'time', 'cik', 'accession', 'extention']]
                 self.logging.debug('after removeing crawerls, index, codes: %s', str(df.size))
@@ -166,13 +167,17 @@ class Processor:
              
             for day_file in listdir(self.config.data_path + '/' + year):
                 if regex_zip.match(day_file):
-                    self.logging.info('Processing day:%s', day_file)
-                    df_day = self.process_day(year, day_file)
-                    if (self.check_chunks(df,df_day)):
-                        idx = self.save_data(df, year, idx)
-                        df = df_day
-                    else:
-                        df = df.append(df_day)
+                    try:
+                        self.logging.info('Processing day:%s', day_file)
+                        df_day = self.process_day(year, day_file)
+                        if (self.check_chunks(df,df_day)):
+                            idx = self.save_data(df, year, idx)
+                            df = df_day
+                        else:
+                            df = df.append(df_day)
+                    
+                    except Exception as err:
+                        logging.error('There has been an error processing day %s\n%s', day_file, err)
                         
             if (df.shape[0]>0):
                 self.logging.info('Saving last chunck for year:%s', year)
