@@ -169,7 +169,7 @@ It is necessary to create in Dropbox an app to save the files into a folder. Gen
 This token is the one that should be in the property access_token in the configuration.
 
 ## Handling errors
-- In case the the file could not be uploaded, it would be saved in the results folder and continue processing the rest of the files.     
+- In case the file could not be uploaded, it would be saved in the results folder and continue processing the rest of the files.     
 - In case that other errors occur, the process would show a message in the console with a description of the error.  
 
     
