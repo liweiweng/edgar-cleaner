@@ -29,15 +29,17 @@ class TransferData:
                                            offset=f.tell())
         commit = dropbox.files.CommitInfo(path=file_to)
         
-        while f.tell() < file_size:
+        while f.tell() <= file_size:
             if ((file_size - f.tell()) <= self.CHUNK_SIZE):
                 dbx.files_upload_session_finish(f.read(self.CHUNK_SIZE),
                                                 cursor,
                                                 commit)
+                break
             else:
                 dbx.files_upload_session_append(f.read(self.CHUNK_SIZE),
                                                 cursor.session_id,
                                                 cursor.offset)
                 cursor.offset = f.tell()
+            
 
 

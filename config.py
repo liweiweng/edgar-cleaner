@@ -18,7 +18,6 @@ class Config:
         self.threshold= int(config['threshold'])
         self.error_code_limit=int(config['error_code_limit'])
         self.output_size_mb=int(config['output_size_mb'])
-        self.access_token=config['access_token']
         self.dropbox_folder=config['dropbox_folder']
         self.dropbox_chunck=int(config['dropbox_chunck'])
         self.dropbox_timeout=float(config['dropbox_timeout'])
