@@ -14,7 +14,8 @@ Python files:
 - config.py: Manage the configuration.   
 - import_masters.py: It contains the code to import master's files.   
 - processor.py: It contains the code that handles the processing of the files.   
-- transfer.py: It handles the upload to Dropbox.   
+- transfer.py: It handles the upload to Dropbox.
+- download_edgar.py: script to import edgar data.   
 
 ## Clone repository
 Clone the repository in your home directory.  
@@ -101,6 +102,13 @@ In the future, the code can be modified in order to process in parallel the info
 
 The project name is in the file mpi/mpi.sh in the -N parameter: "MPI_EDGAR_YEAR"
 
+## Import data
+The EDGAR data can be download directly from the webpage or you can use the following script:  
+```bash
+python downlad_edgar.py -d <directory> -y <year>
+```
+Where directory refers to the local directory where you want to save the files, and year the year since you want to download the data.  
+
 ## Execution manual
 For all years: python clean_edgar.py -c <config_path>          
 For specific year: python clean_edgar.py -c <config_path> -y <year>        
@@ -137,6 +145,7 @@ results_path=/home/mikleal/results
 - master_path:       Path for masters' files   
 - results_path:      Path for temporary result files.       
 
+Inside the ``data_path`` folder there should be a directory for each year with the data to process.  
 
 ## Data Cleaning
 The process of cleaning the data consists in the following steps:  
@@ -172,6 +181,6 @@ This token is the one that should be in the property access_token in the configu
 - In case the file could not be uploaded, it would be saved in the results folder and continue processing the rest of the files.     
 - In case that other errors occur, the process would show a message in the console with a description of the error.  
 
-    
+
 
 
